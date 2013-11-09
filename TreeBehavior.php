@@ -11,7 +11,7 @@
  *
  * @category   Behavior
  * @package    Model.Behavior.Tree
- * @author     Benny L.E.P <bendo01@gmail.com>
+ * @author     Benny Leonard Enrico Panggabean <bendo01@gmail.com>
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -47,15 +47,17 @@ class TreeBehavior extends Behavior implements BehaviorInterface
      * @var array 
      */
     protected $properties;
-
+    /*
+    public function __construct($options = array())
+    {
+        
+    }
+    */
     public function notify($eventType, $model)
     {
         switch ($eventType) {
             case 'afterDelete':
                 $this->removeNodeWithoutChildren($model);
-                break;
-            case 'afterUpdate':
-                $this->rebuildTree($model, 1, null);
                 break;
             case 'beforeCreate':
                 $this->setNodeProperties($model);
@@ -451,16 +453,19 @@ class TreeBehavior extends Behavior implements BehaviorInterface
      */
     public function getTree($model)
     {
-        $roots = $this->getAllRoot($model, false);
-        if (!empty($roots)) {
-            $i=0;
-            foreach ($roots as $root) {
-                if ($this->getChildrenCount($model, $root['id']) > 0 ) {
-                    $roots[$i]['children'] = $this->getChildren($model, $root['id'], true, false);
-                    $roots[$i]['children'] = $this->getSubtree($model, $roots[$i]['children']);
-                }
-                $i++;
-            }    
+        $roots = null;
+        if ($model->count() > 0) {
+            $roots = $this->getAllRoot($model, false);
+            if (!empty($roots)) {
+                $i=0;
+                foreach ($roots as $root) {
+                    if ($this->getChildrenCount($model, $root['id']) > 0 ) {
+                        $roots[$i]['children'] = $this->getChildren($model, $root['id'], true, false);
+                        $roots[$i]['children'] = $this->getSubtree($model, $roots[$i]['children']);
+                    }
+                    $i++;
+                }    
+            }
         }
         return $roots;
     }
